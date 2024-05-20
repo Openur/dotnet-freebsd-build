@@ -1,0 +1,28 @@
+name: Publish packages to Nuget
+
+inputs:
+  token:
+    description: |
+      GitHub personal access token that this action should use. This should be configured using a Secret.
+    required: true
+  owner:
+    description: |
+      The owner of the GitHub Packages where to push.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+
+    - name: Download packages artifacts
+      uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+      with:
+        pattern: packages_*
+        path: packages
+        merge-multiple: true
+
+    - name: Push to GitHub
+      shell: sh
+      run: dotnet nuget push packages/Microsoft.*.freebsd-x64.*.nupkg --no-symbols --skip-duplicate --source https://nuget.pkg.github.com/${{ inputs.owner }}/index.json --api-key ${{ inputs.token }}
