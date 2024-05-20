@@ -1,0 +1,387 @@
+name: 'Build'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/build.yml'
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/build.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet8-aspire
+  DOTNET8_ASPIRE_VERSION: 8.2.2
+  # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet8-core
+  DOTNET8_VERSION: 8.0.20
+  # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet8-runtime
+  DOTNET8_RUNTIME_VERSION: 8.0.20
+  # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet8-aspnetcore
+  DOTNET8_ASPNETCORE_VERSION: 8.0.20
+  # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet8-sdk
+  DOTNET8_SDK_VERSION: 8.0.414
+  # renovate: datasource=github-tags packageName=dotnet/installer depName=dotnet8-installer
+  DOTNET8_INSTALLER_VERSION: 8.0.414
+
+jobs:
+  build_aspire:
+    name: Build Aspire
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout dotnet/aspire
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/aspire
+          ref: v${{ env.DOTNET8_ASPIRE_VERSION }}
+          path: aspire
+
+      - name: Configure
+        run: |
+          set -x
+
+          patch -p1 < patches/aspire_fix-gitinfo-target.patch
+
+      - name: Build
+        run: |
+          set -x
+          source common.sh
+          calculate_build_id v${{ env.DOTNET8_ASPIRE_VERSION }}
+
+          aspire/build.sh --restore --build --ci --configuration Release --pack /p:OfficialBuildId=$OFFICIALBUILDID
+
+      - name: List artifacts
+        run: ls -lR aspire/artifacts
+
+      - name: Upload Packages Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages_aspire
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            aspire/artifacts/packages/Release/Shipping/Microsoft.*.nupkg
+
+  build_sdk:
+    name: Build SDK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout dotnet/sdk
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/sdk
+          ref: v${{ env.DOTNET8_SDK_VERSION }}
+          path: sdk
+
+      - name: Build
+        run: |
+          set -x
+          source common.sh
+          calculate_build_id v${{ env.DOTNET8_SDK_VERSION }}
+
+          sdk/build.sh --ci --configuration Release /p:OfficialBuildId=$OFFICIALBUILDID && sdk/build.sh --ci --configuration Release /p:OfficialBuildId=$OFFICIALBUILDID --pack
+
+      - name: List artifacts
+        run: ls -lR sdk/artifacts
+
+      - name: Upload Packages Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages_sdk
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip
+
+  build_runtime:
+    name: Build Runtime
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout dotnet/runtime
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/runtime
+          ref: v${{ env.DOTNET8_RUNTIME_VERSION }}
+          path: runtime
+
+      - name: Build
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net8.0-cross-freebsd-14-amd64
+        env:
+          NUGET_PACKAGES: /github/workspace/.nuget/packages
+          ROOTFS_DIR: /crossrootfs/x64
+        with:
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET8_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost"
+
+      - name: List artifacts
+        run: ls -lR runtime/artifacts
+
+      - name: Upload Packages Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages_runtime
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz
+            runtime/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
+
+  build_aspnetcore:
+    name: Build ASP.NET Core
+    needs: build_runtime
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout dotnet/aspnetcore
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/aspnetcore
+          ref: v${{ env.DOTNET8_ASPNETCORE_VERSION }}
+          path: aspnetcore
+          submodules: true
+
+      - name: Update submodules
+        run: git -C aspnetcore submodule update --init
+
+      - name: Setup node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 18.x
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: 8.x
+
+      - name: Download Runtime Packages Artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages_runtime
+          path: runtime/artifacts/packages/Release/Shipping
+
+      - name: Configure
+        run: |
+          set -x
+
+          dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name local --configfile aspnetcore/NuGet.config
+
+          mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
+
+      - name: Build
+        run: |
+          set -x
+          source common.sh
+          calculate_build_id v${{ env.DOTNET8_ASPNETCORE_VERSION }}
+
+          aspnetcore/eng/build.sh --ci --os-name freebsd --arch x64 --configuration Release --all --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:SkipTestBuild=true /p:OfficialBuildId=$OFFICIALBUILDID
+
+      - name: List artifacts
+        run: ls -lR aspnetcore/artifacts
+
+      - name: Upload Packages Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages_aspnetcore
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
+
+      - name: Upload Installers Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: installers_aspnetcore
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz
+
+  build_installer:
+    name: Build Installer
+    needs:
+      - build_aspire
+      - build_runtime
+      - build_aspnetcore
+      - build_sdk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout dotnet/installer
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/installer
+          ref: v${{ env.DOTNET8_INSTALLER_VERSION }}
+          path: installer
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: 8.x
+
+      - name: Download Aspire artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages_aspire
+          path: aspire/artifacts/packages/Release/Shipping
+
+      - name: Download SDK artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages_sdk
+          path: sdk/artifacts/packages/Release/NonShipping
+
+      - name: Download Runtime artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages_runtime
+          path: runtime/artifacts/packages/Release/Shipping
+
+      - name: Download ASP.NET Core packages artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages_aspnetcore
+          path: aspnetcore/artifacts/packages/Release/Shipping
+
+      - name: Download ASP.NET Core installers artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: installers_aspnetcore
+          path: aspnetcore/artifacts/installers/Release
+
+      - name: Configure
+        run: |
+          set -x
+
+          dotnet nuget add source ../aspire/artifacts/packages/Release/Shipping --name aspire --configfile installer/NuGet.config
+          dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name runtime --configfile installer/NuGet.config
+          dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping/ --name aspnetcore --configfile installer/NuGet.config
+
+          mkdir -p installer/artifacts/obj/redist/Release/downloads/
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
+          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
+          cp sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip installer/artifacts/obj/redist/Release/downloads/
+
+          sed -i.ORI 's/linux-x64;/&freebsd-x64;/g' installer/src/redist/targets/GenerateBundledVersions.targets
+
+      - name: Build
+        run: |
+          set -x
+          source common.sh
+          calculate_build_id v${{ env.DOTNET8_INSTALLER_VERSION }}
+
+          installer/build.sh --build --ci --configuration Release --pack --architecture x64 --runtime-id freebsd-x64 /p:OSName=freebsd /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=true /p:OfficialBuildId=$OFFICIALBUILDID
+
+      - name: List artifacts
+        run: ls -lR installer/artifacts
+
+      - name: Upload Installer Artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages_installer
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            installer/artifacts/packages/Release/Shipping/dotnet-sdk-*
+
+  artifacts:
+    name: List artifacts
+    needs:
+      - build_installer
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download packages artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: packages_*
+          path: packages
+          merge-multiple: true
+
+      - name: Download installers artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: installers_*
+          path: installers
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lR packages installers
+
+  release:
+    name: Create release
+    needs:
+      - build_installer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Download packages artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: packages_*
+          path: packages
+          merge-multiple: true
+
+      - name: Download installers artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: installers_*
+          path: installers
+          merge-multiple: true
+
+      - name: Create release
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
+        with:
+          artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
+          artifactErrorsFailBuild: true
+          draft: false
+          generateReleaseNotes: false
+          skipIfReleaseExists: true
+          name: .NET ${{ env.DOTNET8_VERSION }} for FreeBSD (build ${{ github.run_number }})
+          tag: v${{ env.DOTNET8_SDK_VERSION }}-${{ github.run_number }}
+
+  publish:
+    name: Publish packages
+    needs:
+      - build_installer
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Publish packages to Nuget
+        uses: ./.github/actions/publish-nuget
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: ${{ github.repository_owner }}
