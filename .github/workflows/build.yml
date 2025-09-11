@@ -4,18 +4,20 @@ on:
   push:
     branches:
       - 'v8'
-    paths-ignore:
-      - '.editorconfig'
-      - '**.md'
+    paths:
+      - '.github/workflows/build.yml'
+      - 'patches/**'
+      - '**.sh'
   pull_request:
     branches:
       - 'v8'
     paths-ignore:
-      - '.editorconfig'
-      - '**.md'
+      - '.github/workflows/build.yml'
+      - 'patches/**'
+      - '**.sh'
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 env:
