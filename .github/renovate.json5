@@ -110,5 +110,11 @@
       matchManagers: ["github-actions"],
       addLabels: ["renovate/github-action"],
     },
+    {
+      description: ["Allowed Node Version for Github Actions"],
+      matchManagers: ["github-actions"],
+      matchPackageNames: ["/node/"],
+      allowedVersions: "/18/",
+    }
   ]
 }
