@@ -24,15 +24,15 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   DOTNET_ASPIRE_VERSION: 8.2.2
-  # renovate: datasource=custom.dotnet8 depName=dotnet
+  # renovate: datasource=custom.dotnet8 depName=dotnet8
   DOTNET_VERSION: 8.0.20
-  # renovate: datasource=custom.dotnet8-runtime depName=dotnet-runtime
+  # renovate: datasource=custom.dotnet8-runtime depName=dotnet8-runtime
   DOTNET_RUNTIME_VERSION: 8.0.20
-  # renovate: datasource=custom.dotnet8-aspnetcore-runtime depName=dotnet-aspnetcore-runtime
+  # renovate: datasource=custom.dotnet8-aspnetcore-runtime depName=dotnet8-aspnetcore-runtime
   DOTNET_ASPNETCORE_VERSION: 8.0.20
-  # renovate: datasource=custom.dotnet8-sdk depName=dotnet-sdk
+  # renovate: datasource=custom.dotnet8-sdk depName=dotnet8-sdk
   DOTNET_SDK_VERSION: 8.0.414
-  # renovate: datasource=custom.dotnet8-sdk depName=dotnet-installer
+  # renovate: datasource=custom.dotnet8-sdk depName=dotnet8-installer
   DOTNET_INSTALLER_VERSION: 8.0.414
 
 jobs:
@@ -40,11 +40,15 @@ jobs:
     name: Build Aspire
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Fetch source
-        run: |
-          git clone https://github.com/dotnet/aspire.git --single-branch --depth 1 --branch v${{ env.DOTNET_ASPIRE_VERSION }}
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/aspire
+          ref: v${{ env.DOTNET_ASPIRE_VERSION }}
+          path: aspire
 
       - name: Configure
         run: |
@@ -77,11 +81,15 @@ jobs:
     name: Build SDK
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Fetch source
-        run: |
-          git clone https://github.com/dotnet/sdk.git --single-branch --depth 1 --branch v${{ env.DOTNET_SDK_VERSION }}
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/sdk
+          ref: v${{ env.DOTNET_SDK_VERSION }}
+          path: sdk
 
       - name: Build
         run: |
@@ -108,20 +116,22 @@ jobs:
     name: Build Runtime
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Fetch source
-        run: |
-          git clone https://github.com/dotnet/runtime.git --single-branch --depth 1 --branch v${{ env.DOTNET_RUNTIME_VERSION }}
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/runtime
+          ref: v${{ env.DOTNET_RUNTIME_VERSION }}
+          path: runtime
 
       - name: Build
-        run: |
-          set -x
-          source common.sh
-          calculate_build_id v${{ env.DOTNET_RUNTIME_VERSION }}
-
-          docker run --rm -v ${{ github.workspace }}/runtime:/runtime -w /runtime -e ROOTFS_DIR=/crossrootfs/x64 mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-cross-freebsd-13 /runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native
-          docker run --rm -v ${{ github.workspace }}/runtime:/runtime -w /runtime -e ROOTFS_DIR=/crossrootfs/x64 mcr.microsoft.com/dotnet-buildtools/prereqs:ubuntu-18.04-cross-freebsd-13 /runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net8.0-cross-freebsd-14-amd64
+        env:
+          ROOTFS_DIR: /crossrootfs/x64
+        with:
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost"
 
       - name: List artifacts
         run: ls -lR runtime/artifacts
@@ -142,22 +152,23 @@ jobs:
     needs: build_runtime
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Setup node
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version: 22
-
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
-        with:
-          dotnet-version: 8.x
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
       - name: Fetch source
         run: |
           git clone https://github.com/dotnet/aspnetcore.git --single-branch --depth 1 --branch v${{ env.DOTNET_ASPNETCORE_VERSION }}
           git -C aspnetcore submodule update --init
+
+      - name: Setup node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 18
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: 8.x
 
       - name: Download Runtime Packages Artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -210,16 +221,20 @@ jobs:
     needs: [build_aspire, build_runtime, build_aspnetcore, build_sdk]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Fetch source
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/installer
+          ref: v${{ env.DOTNET_INSTALLER_VERSION }}
+          path: installer
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
         with:
           dotnet-version: 8.x
-
-      - name: Fetch source
-        run: |
-          git clone https://github.com/dotnet/installer.git --single-branch --depth 1 --branch v${{ env.DOTNET_INSTALLER_VERSION }}
 
       - name: Download Aspire artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -317,8 +332,8 @@ jobs:
         with:
           artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,packages/Microsoft.*.Aspire.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
           artifactErrorsFailBuild: true
-          draft: true
-          generateReleaseNotes: true
-          name: ${{ env.DOTNET_VERSION }}-${{ github.run_number }}
-          skipIfReleaseExists: true
-          tag: v${{ env.DOTNET_VERSION }}-${{ github.run_number }}
+          draft: false
+          generateReleaseNotes: false
+          name: .NET ${{ env.DOTNET_VERSION }}
+          skipIfReleaseExists: false
+          tag: v${{ env.DOTNET_SDK_VERSION }}
