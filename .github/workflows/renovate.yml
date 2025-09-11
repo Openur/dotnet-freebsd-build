@@ -5,9 +5,8 @@ on:
   schedule:
     - cron: '10 * * * *'
   push:
-    paths:
-      - '.github/workflows/renovate.yml'
-      - '.github/renovate.json5?'
+    branches:
+      - 'v8'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
