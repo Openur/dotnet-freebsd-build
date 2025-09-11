@@ -1,18 +1,18 @@
 {
-  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
   extends: [
-    'config:recommended',
-    'helpers:pinGitHubActionDigests',
-    ':disableRateLimiting',
-    ':semanticCommits'
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":disableRateLimiting",
+    ":semanticCommits"
   ],
-  dependencyDashboardTitle: 'Renovate Dashboard',
+  dependencyDashboardTitle: "Renovate Dashboard",
   schedule: [
-    '* * * * *'
+    "* * * * *"
   ],
   suppressNotifications: [
-    'prEditedNotification',
-    'prIgnoreNotification'
+    "prEditedNotification",
+    "prIgnoreNotification"
   ],
   customManagers: [
     {
@@ -28,77 +28,87 @@
   ],
   customDatasources: {
     "dotnet8": {
-      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
-      format: 'json',
+      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
+      format: "json",
       transformTemplates: ['{"releases":$.releases.{"version": $."release-version", "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/core"}}']
     },
     "dotnet8-sdk": {
-      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
-      format: 'json',
+      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
+      format: "json",
       transformTemplates: ['{"releases":$.releases.{"version": $.sdk.version, "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/sdk"}}']
     },
     "dotnet8-runtime": {
-      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
-      format: 'json',
+      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
+      format: "json",
       transformTemplates: ['{"releases":$.releases.{"version": $.runtime.version, "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/runtime"}}']
     },
     "dotnet8-aspnetcore-runtime": {
-      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
-      format: 'json',
+      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
+      format: "json",
       transformTemplates: ['{"releases":$.releases.{"version": $."aspnetcore-runtime".version, "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/runtime"}}']
     },
   },
   packageRules: [
     {
-      description: 'GitHub Actions Group',
-      groupName: 'GitHub Actions',
-      matchManagers: ['github-actions'],
+      description: ".NET Group",
+      groupName: "dotnet",
+      matchManagers: ["custom.regex"],
+      matchPackageNames: ["/dotnet/"],
       group: {
-        commitMessageTopic: '{{{groupName}}} group',
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 5,
+    },
+    {
+      description: "GitHub Actions Group",
+      groupName: "github-actions",
+      matchManagers: ["github-actions"],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
       },
     },
     {
-      matchUpdateTypes: ['major'],
-      semanticCommitType: 'feat',
-      commitMessagePrefix: '{{semanticCommitType}}({{semanticCommitScope}})!:',
-      commitMessageExtra: '( {{currentVersion}} ➔ {{newVersion}} )',
+      matchUpdateTypes: ["major"],
+      semanticCommitType: "feat",
+      commitMessagePrefix: "{{semanticCommitType}}({{semanticCommitScope}})!:",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
     },
     {
-      matchUpdateTypes: ['minor'],
-      semanticCommitType: 'feat',
-      commitMessageExtra: '( {{currentVersion}} ➔ {{newVersion}} )',
+      matchUpdateTypes: ["minor"],
+      semanticCommitType: "feat",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
     },
     {
-      matchUpdateTypes: ['patch'],
-      semanticCommitType: 'fix',
-      commitMessageExtra: '( {{currentVersion}} ➔ {{newVersion}} )',
+      matchUpdateTypes: ["patch"],
+      semanticCommitType: "fix",
+      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
     },
     {
-      matchUpdateTypes: ['digest'],
-      semanticCommitType: 'chore',
-      commitMessageExtra: '( {{currentDigestShort}} ➔ {{newDigestShort}} )',
+      matchUpdateTypes: ["digest"],
+      semanticCommitType: "chore",
+      commitMessageExtra: "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
     },
     {
-      matchManagers: ['github-actions'],
-      semanticCommitType: 'ci',
-      semanticCommitScope: 'github-action',
-      commitMessageTopic: 'action {{depName}}',
+      matchManagers: ["github-actions"],
+      semanticCommitType: "ci",
+      semanticCommitScope: "github-action",
+      commitMessageTopic: "action {{depName}}",
     },
     {
-      matchUpdateTypes: ['major'],
-      labels: ['type/major'],
+      matchUpdateTypes: ["major"],
+      labels: ["type/major"],
     },
     {
-      matchUpdateTypes: ['minor'],
-      labels: ['type/minor'],
+      matchUpdateTypes: ["minor"],
+      labels: ["type/minor"],
     },
     {
-      matchUpdateTypes: ['patch'],
-      labels: ['type/patch'],
+      matchUpdateTypes: ["patch"],
+      labels: ["type/patch"],
     },
     {
-      matchManagers: ['github-actions'],
-      addLabels: ['renovate/github-action'],
+      matchManagers: ["github-actions"],
+      addLabels: ["renovate/github-action"],
     },
   ]
 }
