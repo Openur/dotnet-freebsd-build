@@ -69,6 +69,7 @@ jobs:
           name: packages_aspire
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
           path: |
             aspire/artifacts/packages/Release/Shipping/Microsoft.*.nupkg
 
@@ -99,6 +100,7 @@ jobs:
           name: packages_sdk
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
           path: |
             sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip
 
@@ -130,6 +132,7 @@ jobs:
           name: packages_runtime
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
           path: |
             runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz
             runtime/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
@@ -188,6 +191,7 @@ jobs:
           name: packages_aspnetcore
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
           path: |
             aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
 
@@ -197,6 +201,7 @@ jobs:
           name: installers_aspnetcore
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
           path: |
             aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz
 
@@ -278,6 +283,7 @@ jobs:
           name: packages_installer
           compression-level: 0
           if-no-files-found: error
+          retention-days: 1
           path: |
             installer/artifacts/packages/Release/Shipping/dotnet-sdk-*
 
