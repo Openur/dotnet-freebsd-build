@@ -23,11 +23,16 @@ concurrency:
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  DOTNET_VERSION: 8.0.20
   DOTNET_ASPIRE_VERSION: 8.2.2
+  # renovate: datasource=custom.dotnet8 depName=dotnet
+  DOTNET_VERSION: 8.0.20
+  # renovate: datasource=custom.dotnet8-sdk depName=dotnet-sdk
   DOTNET_SDK_VERSION: 8.0.414
+  # renovate: datasource=custom.dotnet8-runtime depName=dotnet-runtime
   DOTNET_RUNTIME_VERSION: 8.0.20
+  # renovate: datasource=custom.dotnet8-aspnetcore-runtime depName=dotnet-aspnetcore-runtime
   DOTNET_ASPNETCORE_VERSION: 8.0.20
+  # renovate: datasource=custom.dotnet8-sdk depName=dotnet-installer
   DOTNET_INSTALLER_VERSION: 8.0.414
 
 jobs:
