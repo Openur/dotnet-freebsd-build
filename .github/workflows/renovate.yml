@@ -1,0 +1,37 @@
+name: Renovate
+
+on:
+  workflow_dispatch:
+#  schedule:
+#    - cron: '10 * * * *'
+  push:
+    paths:
+      - '.github/workflows/renovate.yml'
+      - '.github/renovate.json5?'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get token
+        id: app-token
+        uses: actions/create-github-app-token@v2.1.1
+        with:
+          app-id: ${{ secrets.BOT_APP_ID }}
+          private-key: ${{ secrets.BOT_PRIVATE_KEY }}
+
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Self-hosted Renovate
+        uses: renovatebot/github-action@v43.0.11
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+        env:
+          RENOVATE_PLATFORM: 'github'
+          RENOVATE_REPOSITORIES: '["${{ github.repository }}"]'
+          LOG_LEVEL: debug
