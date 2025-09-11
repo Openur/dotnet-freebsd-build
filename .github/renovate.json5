@@ -50,10 +50,10 @@
   },
   packageRules: [
     {
-      description: ".NET Group",
-      groupName: "dotnet",
+      description: ".NET 8 Group",
+      groupName: "dotnet8",
       matchManagers: ["custom.regex"],
-      matchPackageNames: ["/dotnet/"],
+      matchPackageNames: ["/dotnet8/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
