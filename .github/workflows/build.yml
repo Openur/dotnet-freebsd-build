@@ -114,6 +114,13 @@ jobs:
         run: |
           git clone https://github.com/dotnet/runtime.git --single-branch --depth 1 --branch v${{ env.DOTNET_RUNTIME_VERSION }}
 
+      - name: Run the build process with Docker
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net8.0-cross-freebsd-14-amd64
+        env:
+          ROOTFS_DIR: /crossrootfs/x64
+        with:
+          args: /bin/sh -c "/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost"
+
       - name: Build
         run: |
           set -x
@@ -147,7 +154,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
-          node-version: 22
+          node-version: 18
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
