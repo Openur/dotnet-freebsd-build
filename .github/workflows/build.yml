@@ -40,7 +40,7 @@ jobs:
     name: Build Aspire
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
       - name: Fetch source
         run: |
@@ -64,7 +64,7 @@ jobs:
         run: ls -lR aspire/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: packages_aspire
           compression-level: 0
@@ -76,7 +76,7 @@ jobs:
     name: Build SDK
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
       - name: Fetch source
         run: |
@@ -94,7 +94,7 @@ jobs:
         run: ls -lR sdk/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: packages_sdk
           compression-level: 0
@@ -106,7 +106,7 @@ jobs:
     name: Build Runtime
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
       - name: Fetch source
         run: |
@@ -125,7 +125,7 @@ jobs:
         run: ls -lR runtime/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: packages_runtime
           compression-level: 0
@@ -139,15 +139,15 @@ jobs:
     needs: build_runtime
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
       - name: Setup node
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 18
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v4.3.1
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 8.x
 
@@ -157,7 +157,7 @@ jobs:
           git -C aspnetcore submodule update --init
 
       - name: Download Runtime Packages Artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: packages_runtime
           path: runtime/artifacts/packages/Release/Shipping
@@ -183,7 +183,7 @@ jobs:
         run: ls -lR aspnetcore/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: packages_aspnetcore
           compression-level: 0
@@ -192,7 +192,7 @@ jobs:
             aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
 
       - name: Upload Installers Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: installers_aspnetcore
           compression-level: 0
@@ -205,10 +205,10 @@ jobs:
     needs: [build_aspire, build_runtime, build_aspnetcore, build_sdk]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v4.3.1
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
         with:
           dotnet-version: 8.x
 
@@ -217,31 +217,31 @@ jobs:
           git clone https://github.com/dotnet/installer.git --single-branch --depth 1 --branch v${{ env.DOTNET_INSTALLER_VERSION }}
 
       - name: Download Aspire artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: packages_aspire
           path: aspire/artifacts/packages/Release/Shipping
 
       - name: Download SDK artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: packages_sdk
           path: sdk/artifacts/packages/Release/NonShipping
 
       - name: Download Runtime artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: packages_runtime
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core packages artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: packages_aspnetcore
           path: aspnetcore/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core installers artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: installers_aspnetcore
           path: aspnetcore/artifacts/installers/Release
@@ -273,7 +273,7 @@ jobs:
         run: ls -lR installer/artifacts
 
       - name: Upload Installer Artifact
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: packages_installer
           compression-level: 0
@@ -289,14 +289,14 @@ jobs:
       contents: write
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           pattern: packages_*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
-        uses: actions/download-artifact@v5.0.0
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           pattern: installers_*
           path: installers
@@ -306,7 +306,7 @@ jobs:
         run: ls -lR packages installers
 
       - name: Create release
-        uses: ncipollo/release-action@v1.18.0
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
         if: github.event_name != 'pull_request'
         with:
           artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,packages/Microsoft.*.Aspire.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
