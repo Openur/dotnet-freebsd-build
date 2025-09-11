@@ -31,7 +31,7 @@ env:
   # renovate: datasource=custom.dotnet8-aspnetcore-runtime depName=dotnet-aspnetcore-runtime
   DOTNET_ASPNETCORE_VERSION: 8.0.19
   # renovate: datasource=custom.dotnet8-sdk depName=dotnet-sdk
-  DOTNET_SDK_VERSION: 8.0.413
+  DOTNET_SDK_VERSION: 8.0.414
   # renovate: datasource=custom.dotnet8-sdk depName=dotnet-installer
   DOTNET_INSTALLER_VERSION: 8.0.413
 
