@@ -14,6 +14,28 @@
     'prEditedNotification',
     'prIgnoreNotification'
   ],
+  customDatasources: {
+    "dotnet8": {
+      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
+      format: 'json',
+      transformTemplates: ['{"releases":$.releases.{"name": $."release-version", "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/core"}}']
+    },
+    "dotnet8-sdk": {
+      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
+      format: 'json',
+      transformTemplates: ['{"releases":$.releases.{"name": $.sdk.version" "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/sdk"}}']
+    },
+    "dotnet8-runtime": {
+      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
+      format: 'json',
+      transformTemplates: ['{"releases":$.releases.{"name": $.runtime.version" "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/runtime"}}']
+    },
+    "dotnet8-aspnetcore-runtime": {
+      defaultRegistryUrlTemplate: 'https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json',
+      format: 'json',
+      transformTemplates: ['{"releases":$.releases.{"name": $."aspnetcore-runtime".version" "changelogUrl": $."release-notes", "sourceUrl":"https://github.com/dotnet/runtime"}}']
+    },
+  },
   packageRules: [
     {
       description: 'GitHub Actions Group',
