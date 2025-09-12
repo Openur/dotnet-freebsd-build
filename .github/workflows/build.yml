@@ -43,7 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Fetch source
+      - name: Checkout dotnet/aspire
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/aspire
@@ -84,7 +84,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Fetch source
+      - name: Checkout dotnet/sdk
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/sdk
@@ -119,7 +119,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Fetch source
+      - name: Checkout dotnet/runtime
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/runtime
@@ -155,15 +155,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Fetch source
-        run: |
-          git clone https://github.com/dotnet/aspnetcore.git --single-branch --depth 1 --branch v${{ env.DOTNET_ASPNETCORE_VERSION }}
-          git -C aspnetcore submodule update --init
+      - name: Checkout dotnet/aspnetcore
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: dotnet/aspnetcore
+          ref: v${{ env.DOTNET_ASPNETCORE_VERSION }}
+          path: aspnetcore
+          submodules: true
+
+      - name: Update submodules
+        run: git -C aspnetcore submodule update --init
 
       - name: Setup node
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
-          node-version: 18
+          node-version: 18.x
 
       - name: Setup dotnet
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
@@ -224,7 +230,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Fetch source
+      - name: Checkout dotnet/installer
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/installer
@@ -308,6 +314,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     steps:
       - name: Download packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -330,10 +337,14 @@ jobs:
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
         if: github.event_name != 'pull_request'
         with:
-          artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,packages/Microsoft.*.Aspire.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
+          artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
           artifactErrorsFailBuild: true
           draft: false
           generateReleaseNotes: false
           name: .NET ${{ env.DOTNET_VERSION }}
           skipIfReleaseExists: false
           tag: v${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Push to Nuget registry
+        if: github.event_name != 'pull_request'
+        run: dotnet nuget push packages/Microsoft.*.freebsd-x64.*.nupkg --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --no-symbols --skip-duplicate
