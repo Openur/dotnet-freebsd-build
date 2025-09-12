@@ -167,11 +167,6 @@ jobs:
       - name: Update submodules
         run: git -C aspnetcore submodule update --init
 
-      - name: Setup node
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
-        with:
-          node-version: 18.x
-
       - name: Setup dotnet
         uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
         with:
@@ -198,7 +193,7 @@ jobs:
           source common.sh
           calculate_build_id v${{ env.DOTNET_ASPNETCORE_VERSION }}
 
-          aspnetcore/eng/build.sh --ci --os-name freebsd --arch x64 --configuration Release --all --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID
+          aspnetcore/eng/build.sh --ci --os-name freebsd --arch x64 --configuration Release --all --no-build-nodejs --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:SkipTestBuild=true /p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
         run: ls -lR aspnetcore/artifacts
