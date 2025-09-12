@@ -224,7 +224,11 @@ jobs:
 
   build_installer:
     name: Build Installer
-    needs: [build_aspire, build_runtime, build_aspnetcore, build_sdk]
+    needs:
+      - build_aspire
+      - build_runtime
+      - build_aspnetcore
+      - build_sdk
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -310,11 +314,11 @@ jobs:
 
   release:
     name: Create release
-    needs: build_installer
+    needs:
+      - build_installer
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      packages: write
     steps:
       - name: Download packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -330,9 +334,6 @@ jobs:
           path: installers
           merge-multiple: true
 
-      - name: List artifacts
-        run: ls -lR packages installers
-
       - name: Create release
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
         if: github.event_name != 'pull_request'
@@ -345,6 +346,27 @@ jobs:
           name: .NET ${{ env.DOTNET_VERSION }} for FreeBSD (build ${{ github.run_number }})
           tag: v${{ env.DOTNET_SDK_VERSION }}-${{ github.run_number }}
 
+  publish-nuget:
+    name: Publish packages
+    needs:
+      - build_installer
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
+        with:
+          dotnet-version: 8.x
+
+      - name: Download packages artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: packages_*
+          path: packages
+          merge-multiple: true
+
       - name: Push to Nuget registry
         if: github.event_name != 'pull_request'
-        run: dotnet nuget push packages/Microsoft.*.freebsd-x64.*.nupkg --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --no-symbols --skip-duplicate
+        run: |
+          dotnet nuget push "packages/Microsoft.*.freebsd-x64.*.nupkg" --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }} --no-symbols --skip-duplicate
