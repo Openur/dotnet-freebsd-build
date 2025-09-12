@@ -341,9 +341,9 @@ jobs:
           artifactErrorsFailBuild: true
           draft: false
           generateReleaseNotes: false
-          name: .NET ${{ env.DOTNET_VERSION }}
-          skipIfReleaseExists: false
-          tag: v${{ env.DOTNET_SDK_VERSION }}
+          skipIfReleaseExists: true
+          name: .NET ${{ env.DOTNET_VERSION }} for FreeBSD (build ${{ github.run_number }})
+          tag: v${{ env.DOTNET_SDK_VERSION }}-${{ github.run_number }}
 
       - name: Push to Nuget registry
         if: github.event_name != 'pull_request'
