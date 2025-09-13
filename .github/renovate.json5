@@ -20,40 +20,18 @@
       description: "Process annotated dependencies",
       managerFilePatterns: ["/\\.ya?ml$/"],
       matchStrings: [
-        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)",
+        "datasource=(?<datasource>\\S+)(?: packageName=(?<packageName>\\S+))? depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?\\n.+(:\\s|=)(&\\S+\\s)?(?<currentValue>\\S+)",
       ],
       datasourceTemplate: "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
   ],
-  customDatasources: {
-    "dotnet8": {
-      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
-      format: "json",
-      transformTemplates: ['{"releases": $.releases.{"version": $."release-version", "releaseTimestamp": $."release-date", "changelogUrl": $."release-notes", "sourceUrl": "https://github.com/dotnet/core"}}']
-    },
-    "dotnet8-sdk": {
-      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
-      format: "json",
-      transformTemplates: ['{"releases": $.releases.{"version": $.sdk.version, "releaseTimestamp": $."release-date", "changelogUrl": $."release-notes", "sourceUrl": "https://github.com/dotnet/sdk"}}']
-    },
-    "dotnet8-runtime": {
-      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
-      format: "json",
-      transformTemplates: ['{"releases": $.releases.{"version": $.runtime.version, "releaseTimestamp": $."release-date", "changelogUrl": $."release-notes", "sourceUrl": "https://github.com/dotnet/runtime"}}']
-    },
-    "dotnet8-aspnetcore-runtime": {
-      defaultRegistryUrlTemplate: "https://builds.dotnet.microsoft.com/dotnet/release-metadata/8.0/releases.json",
-      format: "json",
-      transformTemplates: ['{"releases": $.releases.{"version": $."aspnetcore-runtime".version, "releaseTimestamp": $."release-date", "changelogUrl": $."release-notes", "sourceUrl": "https://github.com/dotnet/runtime"}}']
-    },
-  },
   packageRules: [
     {
-      description: ".NET 8 Group",
-      groupName: "dotnet8",
-      matchManagers: ["custom.regex"],
-      matchPackageNames: ["/dotnet8/"],
+      description: ".NET Group",
+      groupName: "dotnet",
+      matchDatasources: ["github-tags"],
+      matchPackageNames: ["/dotnet/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
@@ -115,6 +93,11 @@
       matchManagers: ["github-actions"],
       matchPackageNames: ["/^node$/"],
       allowedVersions: "<=18",
+    },
+    {
+      matchPackageNames: ["dotnet"],
+      matchUpdateTypes: ["major"],
+      dependencyDashboardApproval: true,
     }
   ]
 }
