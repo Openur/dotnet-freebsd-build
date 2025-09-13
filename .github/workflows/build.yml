@@ -21,7 +21,7 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet-aspire
-  DOTNET8_ASPIRE_VERSION: 8.2.2
+  DOTNET8_ASPIRE_VERSION: 9.4.2
   # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet-core
   DOTNET8_VERSION: 8.0.20
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet-runtime
