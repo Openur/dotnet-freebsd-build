@@ -23,7 +23,7 @@ env:
   # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet8-aspire
   DOTNET8_ASPIRE_VERSION: 8.2.2
   # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet8-core
-  DOTNET8_VERSION: 8.0.20
+  DOTNET8_VERSION: 9.0.9
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet8-runtime
   DOTNET8_RUNTIME_VERSION: 8.0.20
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet8-aspnetcore
