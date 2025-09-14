@@ -15,8 +15,6 @@ runs:
   steps:
     - name: Setup dotnet
       uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
-      with:
-        dotnet-version: 8.x
 
     - name: Download packages artifacts
       uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0

@@ -28,10 +28,31 @@
   ],
   packageRules: [
     {
+      description: ".NET 9 Group",
+      groupName: "dotnet9",
+      matchDatasources: ["github-tags"],
+      matchPackageNames: [
+        "/dotnet9-core/",
+        "/dotnet9-runtime/",
+        "/dotnet9-aspnetcore/",
+        "/dotnet9-sdk/"
+      ],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 4,
+    },
+    {
       description: ".NET 8 Group",
       groupName: "dotnet8",
       matchDatasources: ["github-tags"],
-      matchPackageNames: ["/dotnet8/"],
+      matchPackageNames: [
+        "/dotnet8-core/",
+        "/dotnet8-runtime/",
+        "/dotnet8-aspnetcore/",
+        "/dotnet8-sdk/",
+        "/dotnet8-installer/",
+      ],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
