@@ -20,18 +20,16 @@ concurrency:
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet8-aspire
-  DOTNET8_ASPIRE_VERSION: 8.2.2
-  # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet8-core
-  DOTNET8_VERSION: 8.0.20
-  # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet8-runtime
-  DOTNET8_RUNTIME_VERSION: 8.0.20
-  # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet8-aspnetcore
-  DOTNET8_ASPNETCORE_VERSION: 8.0.20
-  # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet8-sdk
-  DOTNET8_SDK_VERSION: 8.0.414
-  # renovate: datasource=github-tags packageName=dotnet/installer depName=dotnet8-installer
-  DOTNET8_INSTALLER_VERSION: 8.0.414
+  # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet9-aspire
+  DOTNET9_ASPIRE_VERSION: 9.4.2
+  # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet9-core
+  DOTNET9_VERSION: 9.0.9
+  # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet9-runtime
+  DOTNET9_RUNTIME_VERSION: 9.0.9
+  # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet9-aspnetcore
+  DOTNET9_ASPNETCORE_VERSION: 9.0.9
+  # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet9-sdk
+  DOTNET9_SDK_VERSION: 9.0.305
 
 jobs:
   build_aspire:
@@ -45,7 +43,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/aspire
-          ref: v${{ env.DOTNET8_ASPIRE_VERSION }}
+          ref: v${{ env.DOTNET9_ASPIRE_VERSION }}
           path: aspire
 
       - name: Configure
@@ -58,7 +56,7 @@ jobs:
         run: |
           set -x
           source common.sh
-          calculate_build_id v${{ env.DOTNET8_ASPIRE_VERSION }}
+          calculate_build_id v${{ env.DOTNET9_ASPIRE_VERSION }}
 
           aspire/build.sh --restore --build --ci --configuration Release --pack /p:OfficialBuildId=$OFFICIALBUILDID
 
@@ -75,41 +73,6 @@ jobs:
           path: |
             aspire/artifacts/packages/Release/Shipping/Microsoft.*.nupkg
 
-  build_sdk:
-    name: Build SDK
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-
-      - name: Checkout dotnet/sdk
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-        with:
-          repository: dotnet/sdk
-          ref: v${{ env.DOTNET8_SDK_VERSION }}
-          path: sdk
-
-      - name: Build
-        run: |
-          set -x
-          source common.sh
-          calculate_build_id v${{ env.DOTNET8_SDK_VERSION }}
-
-          sdk/build.sh --ci --configuration Release /p:OfficialBuildId=$OFFICIALBUILDID && sdk/build.sh --ci --configuration Release /p:OfficialBuildId=$OFFICIALBUILDID --pack
-
-      - name: List artifacts
-        run: ls -lR sdk/artifacts
-
-      - name: Upload Packages Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: packages_sdk
-          compression-level: 0
-          if-no-files-found: error
-          retention-days: 1
-          path: |
-            sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip
-
   build_runtime:
     name: Build Runtime
     runs-on: ubuntu-latest
@@ -121,16 +84,16 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/runtime
-          ref: v${{ env.DOTNET8_RUNTIME_VERSION }}
+          ref: v${{ env.DOTNET9_RUNTIME_VERSION }}
           path: runtime
 
       - name: Build
-        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net8.0-cross-freebsd-14-amd64
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net9.0-cross-freebsd-14-amd64
         env:
           NUGET_PACKAGES: /github/workspace/.nuget/packages
           ROOTFS_DIR: /crossrootfs/x64
         with:
-          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET8_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost"
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET9_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost"
 
       - name: List artifacts
         run: ls -lR runtime/artifacts
@@ -158,7 +121,7 @@ jobs:
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
           repository: dotnet/aspnetcore
-          ref: v${{ env.DOTNET8_ASPNETCORE_VERSION }}
+          ref: v${{ env.DOTNET9_ASPNETCORE_VERSION }}
           path: aspnetcore
           submodules: true
 
@@ -168,12 +131,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
-          node-version: 18.x
-
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
-        with:
-          dotnet-version: 8.x
+          node-version: 24.x
 
       - name: Download Runtime Packages Artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -194,7 +152,7 @@ jobs:
         run: |
           set -x
           source common.sh
-          calculate_build_id v${{ env.DOTNET8_ASPNETCORE_VERSION }}
+          calculate_build_id v${{ env.DOTNET9_ASPNETCORE_VERSION }}
 
           aspnetcore/eng/build.sh --ci --os-name freebsd --arch x64 --configuration Release --all --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:SkipTestBuild=true /p:OfficialBuildId=$OFFICIALBUILDID
 
@@ -221,41 +179,29 @@ jobs:
           path: |
             aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz
 
-  build_installer:
-    name: Build Installer
+  build_sdk:
+    name: Build SDK
     needs:
       - build_aspire
       - build_runtime
       - build_aspnetcore
-      - build_sdk
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Checkout dotnet/installer
+      - name: Checkout dotnet/sdk
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          repository: dotnet/installer
-          ref: v${{ env.DOTNET8_INSTALLER_VERSION }}
-          path: installer
-
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d # v5.0.0
-        with:
-          dotnet-version: 8.x
+          repository: dotnet/sdk
+          ref: v${{ env.DOTNET9_SDK_VERSION }}
+          path: sdk
 
       - name: Download Aspire artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: packages_aspire
           path: aspire/artifacts/packages/Release/Shipping
-
-      - name: Download SDK artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
-        with:
-          name: packages_sdk
-          path: sdk/artifacts/packages/Release/NonShipping
 
       - name: Download Runtime artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -279,42 +225,43 @@ jobs:
         run: |
           set -x
 
-          dotnet nuget add source ../aspire/artifacts/packages/Release/Shipping --name aspire --configfile installer/NuGet.config
-          dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name runtime --configfile installer/NuGet.config
-          dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping/ --name aspnetcore --configfile installer/NuGet.config
+          dotnet nuget add source ../aspire/artifacts/packages/Release/Shipping --name aspire --configfile sdk/NuGet.config
+          dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name runtime --configfile sdk/NuGet.config
+          dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping/ --name aspnetcore --configfile sdk/NuGet.config
 
-          mkdir -p installer/artifacts/obj/redist/Release/downloads/
-          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
-          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
-          cp sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip installer/artifacts/obj/redist/Release/downloads/
+          mkdir -p sdk/artifacts/obj/redist/Release/downloads/ sdk/artifacts/obj/redist-installer/Release/downloads/
 
-          sed -i.ORI 's/linux-x64;/&freebsd-x64;/g' installer/src/redist/targets/GenerateBundledVersions.targets
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist/Release/downloads/
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist-installer/Release/downloads/
+
+          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist/Release/downloads/
+          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist-installer/Release/downloads/
 
       - name: Build
         run: |
           set -x
           source common.sh
-          calculate_build_id v${{ env.DOTNET8_INSTALLER_VERSION }}
+          calculate_build_id v${{ env.DOTNET9_SDK_VERSION }}
 
-          installer/build.sh --build --ci --configuration Release --pack --architecture x64 --runtime-id freebsd-x64 /p:OSName=freebsd /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=true /p:OfficialBuildId=$OFFICIALBUILDID
+          sdk/build.sh --ci --configuration Release --pack /p:OSName=freebsd /p:Architecture=x64 /p:Rid=freebsd-x64 /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=true /p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
-        run: ls -lR installer/artifacts
+        run: ls -lR sdk/artifacts
 
-      - name: Upload Installer Artifact
+      - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_installer
+          name: packages_sdk
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
           path: |
-            installer/artifacts/packages/Release/Shipping/dotnet-sdk-*
+            sdk/artifacts/packages/Release/Shipping/dotnet-sdk-*
 
   release:
     name: Create release
     needs:
-      - build_installer
+      - build_sdk
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -342,13 +289,13 @@ jobs:
           draft: false
           generateReleaseNotes: false
           skipIfReleaseExists: true
-          name: .NET ${{ env.DOTNET8_VERSION }} for FreeBSD (build ${{ github.run_number }})
-          tag: v${{ env.DOTNET8_SDK_VERSION }}-${{ github.run_number }}
+          name: .NET ${{ env.DOTNET9_VERSION }} for FreeBSD (build ${{ github.run_number }})
+          tag: v${{ env.DOTNET9_SDK_VERSION }}-${{ github.run_number }}
 
   publish:
     name: Publish packages
     needs:
-      - build_installer
+      - build_sdk
     runs-on: ubuntu-latest
     permissions:
       packages: write

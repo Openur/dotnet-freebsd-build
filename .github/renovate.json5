@@ -29,9 +29,9 @@
   packageRules: [
     {
       description: ".NET 8 Group",
-      groupName: "dotnet8",
+      groupName: "dotnet9",
       matchDatasources: ["github-tags"],
-      matchPackageNames: ["/dotnet8/"],
+      matchPackageNames: ["/dotnet9/"],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
