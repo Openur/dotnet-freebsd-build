@@ -367,11 +367,13 @@ jobs:
           skipIfReleaseExists: true
           name: .NET ${{ env.DOTNET_VERSION }} for FreeBSD (build ${{ github.run_number }})
           tag: v${{ env.DOTNET_SDK_VERSION }}-${{ github.run_number }}
+          immutableCreate: true
 
   publish:
     name: Publish packages
     needs:
       - build_installer
+      - release
     runs-on: ubuntu-latest
     permissions:
       packages: write
