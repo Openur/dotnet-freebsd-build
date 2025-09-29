@@ -66,7 +66,7 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_aspire
+          name: packages-aspire
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -76,6 +76,12 @@ jobs:
   build_runtime:
     name: Build Runtime
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - x64
+          - arm64
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -87,7 +93,8 @@ jobs:
           ref: v${{ env.DOTNET_RUNTIME_VERSION }}
           path: runtime
 
-      - name: Build
+      - name: Build x64
+        if: matrix.architecture == 'x64'
         uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net9.0-cross-freebsd-14-amd64
         env:
           NUGET_PACKAGES: /github/workspace/.nuget/packages
@@ -95,24 +102,39 @@ jobs:
         with:
           args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch x64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-x64.Release/apphost/standalone/apphost"
 
+      - name: Build arm64
+        if: matrix.architecture == 'arm64'
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net9.0-cross-freebsd-14-arm64
+        env:
+          NUGET_PACKAGES: /github/workspace/.nuget/packages
+          ROOTFS_DIR: /crossrootfs/arm64
+        with:
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch arm64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch arm64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-arm64.Release/apphost/standalone/apphost"
+
       - name: List artifacts
         run: ls -lR runtime/artifacts
 
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_runtime
+          name: packages-runtime-${{ matrix.architecture }}
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
           path: |
-            runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz
-            runtime/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
+            runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz
+            runtime/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-*.*.nupkg
 
   build_aspnetcore:
     name: Build ASP.NET Core
     needs: build_runtime
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - x64
+          - arm64
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -136,7 +158,7 @@ jobs:
       - name: Download Runtime Packages Artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_runtime
+          name: packages-runtime-${{ matrix.architecture }}
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Configure
@@ -146,7 +168,7 @@ jobs:
           dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name local --configfile aspnetcore/NuGet.config
 
           mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
-          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
 
       - name: Build
         run: |
@@ -154,7 +176,7 @@ jobs:
           source common.sh
           calculate_build_id v${{ env.DOTNET_ASPNETCORE_VERSION }}
 
-          aspnetcore/eng/build.sh --ci --os-name freebsd --arch x64 --configuration Release --all --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:SkipTestBuild=true /p:OfficialBuildId=$OFFICIALBUILDID
+          aspnetcore/eng/build.sh --ci --os-name freebsd --arch ${{ matrix.architecture }} --configuration Release --all --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:SkipTestBuild=true /p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
         run: ls -lR aspnetcore/artifacts
@@ -162,22 +184,22 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_aspnetcore
+          name: packages-aspnetcore-${{ matrix.architecture }}
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
           path: |
-            aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
+            aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-*.*.nupkg
 
       - name: Upload Installers Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: installers_aspnetcore
+          name: installers-aspnetcore-${{ matrix.architecture }}
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
           path: |
-            aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz
+            aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-*.tar.gz
 
   build_sdk:
     name: Build SDK
@@ -186,6 +208,12 @@ jobs:
       - build_runtime
       - build_aspnetcore
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - x64
+          - arm64
     steps:
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -200,25 +228,25 @@ jobs:
       - name: Download Aspire artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_aspire
+          name: packages-aspire
           path: aspire/artifacts/packages/Release/Shipping
 
       - name: Download Runtime artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_runtime
+          name: packages-runtime-${{ matrix.architecture }}
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_aspnetcore
+          name: packages-aspnetcore-${{ matrix.architecture }}
           path: aspnetcore/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core installers artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: installers_aspnetcore
+          name: installers-aspnetcore-${{ matrix.architecture }}
           path: aspnetcore/artifacts/installers/Release
 
       - name: Configure
@@ -231,11 +259,11 @@ jobs:
 
           mkdir -p sdk/artifacts/obj/redist/Release/downloads/ sdk/artifacts/obj/redist-installer/Release/downloads/
 
-          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist/Release/downloads/
-          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist-installer/Release/downloads/
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz sdk/artifacts/obj/redist/Release/downloads/
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz sdk/artifacts/obj/redist-installer/Release/downloads/
 
-          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist/Release/downloads/
-          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz sdk/artifacts/obj/redist-installer/Release/downloads/
+          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-*.tar.gz sdk/artifacts/obj/redist/Release/downloads/
+          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-*.tar.gz sdk/artifacts/obj/redist-installer/Release/downloads/
 
       - name: Build
         run: |
@@ -243,7 +271,7 @@ jobs:
           source common.sh
           calculate_build_id v${{ env.DOTNET_SDK_VERSION }}
 
-          sdk/build.sh --ci --configuration Release --pack /p:OSName=freebsd /p:Architecture=x64 /p:Rid=freebsd-x64 /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=true /p:OfficialBuildId=$OFFICIALBUILDID
+          sdk/build.sh --ci --configuration Release --pack /p:OSName=freebsd /p:Architecture=${{ matrix.architecture }} /p:Rid=freebsd-${{ matrix.architecture }} /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=true /p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
         run: ls -lR sdk/artifacts
@@ -251,7 +279,7 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_sdk
+          name: packages-sdk-${{ matrix.architecture }}
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -267,14 +295,14 @@ jobs:
       - name: Download packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: packages_*
+          pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: installers_*
+          pattern: installers-*
           path: installers
           merge-multiple: true
 
@@ -293,21 +321,21 @@ jobs:
       - name: Download packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: packages_*
+          pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: installers_*
+          pattern: installers-*
           path: installers
           merge-multiple: true
 
       - name: Create release
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
         with:
-          artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
+          artifacts: packages/dotnet-runtime-*-freebsd-*.tar.gz,packages/dotnet-sdk-*-freebsd-*.tar.gz,packages/Microsoft.*.freebsd-*.*.nupkg,installers/aspnetcore-runtime-*-freebsd-*.tar.gz
           artifactErrorsFailBuild: true
           draft: false
           generateReleaseNotes: false
