@@ -7,6 +7,9 @@ on:
   push:
     branches:
       - 'main'
+  issues:
+    types:
+      - 'edited'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
@@ -15,6 +18,7 @@ concurrency:
 jobs:
   renovate:
     runs-on: ubuntu-latest
+    if: github.event_name != 'issues' || contains(github.event.issue.title, 'Renovate Dashboard')
     steps:
       - name: Get token
         id: app-token
