@@ -1,7 +1,6 @@
 name: Renovate
 
 on:
-  workflow_dispatch:
   schedule:
     - cron: '10 * * * *'
   push:
@@ -10,6 +9,19 @@ on:
   issues:
     types:
       - 'edited'
+  workflow_dispatch:
+    inputs:
+      log-level:
+        description: Log level
+        required: false
+        default: info
+        type: choice
+        options: [ info, debug, trace ]
+      dry-run:
+        description: Dry run (no changes made)
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
@@ -35,5 +47,8 @@ jobs:
         with:
           token: ${{ steps.app-token.outputs.token }}
         env:
+          LOG_LEVEL: ${{ inputs.log-level || 'info' }}
+          RENOVATE_DRY_RUN: ${{ inputs.dry-run == true }}
           RENOVATE_PLATFORM: 'github'
+          RENOVATE_PLATFORM_COMMIT: true
           RENOVATE_REPOSITORIES: '["${{ github.repository }}"]'
