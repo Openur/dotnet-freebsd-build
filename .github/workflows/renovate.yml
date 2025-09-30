@@ -7,15 +7,32 @@ on:
   push:
     branches:
       - 'main'
+  issues:
+    types:
+      - 'edited'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  renovate:
+  context:
     runs-on: ubuntu-latest
     steps:
+      - name: Dump GitHub context
+        env:
+          CONTEXT: ${{ toJson(github.event.issue) }}
+        run: echo "$CONTEXT"
+
+  renovate:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'issues' || contains(github.event.issue.title, 'Renovate Dashboard')
+    steps:
+      - name: Dump GitHub context
+        env:
+          CONTEXT: ${{ toJson(github) }}
+        run: echo "$CONTEXT"
+
       - name: Get token
         id: app-token
         uses: actions/create-github-app-token@67018539274d69449ef7c02e8e71183d1719ab42 # v2.1.4
