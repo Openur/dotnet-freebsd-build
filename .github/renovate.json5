@@ -32,6 +32,21 @@
   ],
   packageRules: [
     {
+      description: ".NET 10 Group",
+      groupName: "dotnet10",
+      matchDatasources: ["github-tags"],
+      matchDepNames: [
+        "dotnet10-core",
+        "dotnet10-runtime",
+        "dotnet10-aspnetcore",
+        "dotnet10-sdk"
+      ],
+      group: {
+        commitMessageTopic: "{{{groupName}}} group",
+      },
+      minimumGroupSize: 4,
+    },
+    {
       description: ".NET 9 Group",
       groupName: "dotnet9",
       matchDatasources: ["github-tags"],
