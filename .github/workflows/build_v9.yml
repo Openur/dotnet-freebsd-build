@@ -58,7 +58,7 @@ jobs:
           source common.sh
           calculate_build_id v${{ env.DOTNET_ASPIRE_VERSION }}
 
-          aspire/build.sh --restore --build --ci --configuration Release --pack /p:OfficialBuildId=$OFFICIALBUILDID
+          aspire/build.sh --restore --build --ci --configuration Release --pack -p:InstallBrowsersForPlaywright=false -p:SkipTestProjects=true -p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
         run: ls -lR aspire/artifacts

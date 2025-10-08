@@ -60,7 +60,7 @@ jobs:
           source common.sh
           calculate_build_id v${{ env.DOTNET_ASPIRE_VERSION }}
 
-          aspire/build.sh --restore --build --ci --configuration Release --pack /p:OfficialBuildId=$OFFICIALBUILDID
+          aspire/build.sh --restore --build --ci --configuration Release --pack -p:InstallBrowsersForPlaywright=false -p:SkipTestProjects=true -p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
         run: ls -lR aspire/artifacts
@@ -68,7 +68,7 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_aspire
+          name: packages-aspire
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -103,7 +103,7 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_sdk
+          name: packages-sdk
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -138,7 +138,7 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_runtime
+          name: packages-runtime
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -178,7 +178,7 @@ jobs:
       - name: Download Runtime Packages Artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_runtime
+          name: packages-runtime
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Configure
@@ -204,7 +204,7 @@ jobs:
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_aspnetcore
+          name: packages-aspnetcore
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -214,7 +214,7 @@ jobs:
       - name: Upload Installers Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: installers_aspnetcore
+          name: installers-aspnetcore
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -248,31 +248,31 @@ jobs:
       - name: Download Aspire artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_aspire
+          name: packages-aspire
           path: aspire/artifacts/packages/Release/Shipping
 
       - name: Download SDK artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_sdk
+          name: packages-sdk
           path: sdk/artifacts/packages/Release/NonShipping
 
       - name: Download Runtime artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_runtime
+          name: packages-runtime
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: packages_aspnetcore
+          name: packages-aspnetcore
           path: aspnetcore/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core installers artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          name: installers_aspnetcore
+          name: installers-aspnetcore
           path: aspnetcore/artifacts/installers/Release
 
       - name: Configure
@@ -304,7 +304,7 @@ jobs:
       - name: Upload Installer Artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: packages_installer
+          name: packages-installer
           compression-level: 0
           if-no-files-found: error
           retention-days: 1
@@ -320,14 +320,14 @@ jobs:
       - name: Download packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: packages_*
+          pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: installers_*
+          pattern: installers-*
           path: installers
           merge-multiple: true
 
@@ -346,14 +346,14 @@ jobs:
       - name: Download packages artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: packages_*
+          pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          pattern: installers_*
+          pattern: installers-*
           path: installers
           merge-multiple: true
 
