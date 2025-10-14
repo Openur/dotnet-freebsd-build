@@ -25,7 +25,7 @@ env:
   # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet8-core
   DOTNET_VERSION: 8.0.20
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet8-runtime
-  DOTNET_RUNTIME_VERSION: 8.0.20
+  DOTNET_RUNTIME_VERSION: 8.0.21
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet8-aspnetcore
   DOTNET_ASPNETCORE_VERSION: 8.0.20
   # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet8-sdk
