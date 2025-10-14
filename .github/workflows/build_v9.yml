@@ -25,7 +25,7 @@ env:
   # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet9-core
   DOTNET_VERSION: 9.0.9
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet9-runtime
-  DOTNET_RUNTIME_VERSION: 9.0.9
+  DOTNET_RUNTIME_VERSION: 9.0.10
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet9-aspnetcore
   DOTNET_ASPNETCORE_VERSION: 9.0.9
   # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet9-sdk
