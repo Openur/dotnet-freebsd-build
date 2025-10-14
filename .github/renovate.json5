@@ -62,6 +62,14 @@
       description: "GitHub Actions Group",
       groupName: "github-actions",
       matchManagers: ["github-actions"],
+      matchPackageNames: [
+        "/^actions\//",
+        "/^github\//",
+        "/^docker\//",
+      ],
+      matchDepTypes: [
+        "action",
+      ],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
@@ -108,12 +116,6 @@
     {
       matchManagers: ["github-actions"],
       addLabels: ["renovate/github-action"],
-    },
-    {
-      description: "Disable major updates for node",
-      enabled: false,
-      matchManagers: ["github-actions"],
-      matchPackageNames: ["/^node$/"],
     },
     {
       description: "Disable major updates for dotnet",
