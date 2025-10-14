@@ -29,7 +29,7 @@ env:
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet9-aspnetcore
   DOTNET_ASPNETCORE_VERSION: 9.0.9
   # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet9-sdk
-  DOTNET_SDK_VERSION: 9.0.305
+  DOTNET_SDK_VERSION: 9.0.306
 
 jobs:
   build_aspire:
