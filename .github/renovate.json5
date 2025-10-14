@@ -14,6 +14,9 @@
     "prEditedNotification",
     "prIgnoreNotification"
   ],
+  "ignorePresets": [
+    "group:dotnetMonorepo",
+  ],
   customManagers: [
     {
       customType: "regex",
