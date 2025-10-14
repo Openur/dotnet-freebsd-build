@@ -4,7 +4,8 @@
     "config:recommended",
     "helpers:pinGitHubActionDigests",
     ":disableRateLimiting",
-    ":semanticCommits"
+    ":semanticCommits",
+    ":separateMajorReleases"
   ],
   dependencyDashboardTitle: "Renovate Dashboard",
   schedule: [
@@ -13,6 +14,9 @@
   suppressNotifications: [
     "prEditedNotification",
     "prIgnoreNotification"
+  ],
+  "ignorePresets": [
+    "group:dotnetMonorepo",
   ],
   customManagers: [
     {
