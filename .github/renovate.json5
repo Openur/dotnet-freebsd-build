@@ -14,6 +14,10 @@
     "prEditedNotification",
     "prIgnoreNotification"
   ],
+  "ignorePresets": [
+    "group:aspireMonorepo",
+    "group:dotnetMonorepo",
+  ],
   customManagers: [
     {
       customType: "regex",
@@ -31,11 +35,11 @@
       description: ".NET 9 Group",
       groupName: "dotnet9",
       matchDatasources: ["github-tags"],
-      matchPackageNames: [
-        "/dotnet9-core/",
-        "/dotnet9-runtime/",
-        "/dotnet9-aspnetcore/",
-        "/dotnet9-sdk/"
+      matchDepNames: [
+        "dotnet9-core",
+        "dotnet9-runtime",
+        "dotnet9-aspnetcore",
+        "dotnet9-sdk"
       ],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
@@ -46,12 +50,12 @@
       description: ".NET 8 Group",
       groupName: "dotnet8",
       matchDatasources: ["github-tags"],
-      matchPackageNames: [
-        "/dotnet8-core/",
-        "/dotnet8-runtime/",
-        "/dotnet8-aspnetcore/",
-        "/dotnet8-sdk/",
-        "/dotnet8-installer/",
+      matchDepNames: [
+        "dotnet8-core",
+        "dotnet8-runtime",
+        "dotnet8-aspnetcore",
+        "dotnet8-sdk",
+        "dotnet8-installer"
       ],
       group: {
         commitMessageTopic: "{{{groupName}}} group",
@@ -122,6 +126,6 @@
       enabled: false,
       matchPackageNames: ["/dotnet/"],
       matchUpdateTypes: ["major"],
-    }
+    },
   ]
 }
