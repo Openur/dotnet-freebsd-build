@@ -93,6 +93,12 @@ jobs:
           ref: v${{ env.DOTNET_RUNTIME_VERSION }}
           path: runtime
 
+      - name: Configure
+        run: |
+          set -x
+
+          patch -p1 < patches/dotnet9_runtime_update_microsoft_build.patch
+
       - name: Build x64
         if: matrix.architecture == 'x64'
         uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net9.0-cross-freebsd-14-amd64
