@@ -66,7 +66,7 @@ jobs:
         run: ls -lR aspire/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: packages-aspire
           compression-level: 0
@@ -101,7 +101,7 @@ jobs:
         run: ls -lR sdk/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: packages-sdk
           compression-level: 0
@@ -136,7 +136,7 @@ jobs:
         run: ls -lR runtime/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: packages-runtime
           compression-level: 0
@@ -176,7 +176,7 @@ jobs:
           dotnet-version: 8.x
 
       - name: Download Runtime Packages Artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages-runtime
           path: runtime/artifacts/packages/Release/Shipping
@@ -202,7 +202,7 @@ jobs:
         run: ls -lR aspnetcore/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: packages-aspnetcore
           compression-level: 0
@@ -212,7 +212,7 @@ jobs:
             aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
 
       - name: Upload Installers Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: installers-aspnetcore
           compression-level: 0
@@ -246,31 +246,31 @@ jobs:
           dotnet-version: 8.x
 
       - name: Download Aspire artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages-aspire
           path: aspire/artifacts/packages/Release/Shipping
 
       - name: Download SDK artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages-sdk
           path: sdk/artifacts/packages/Release/NonShipping
 
       - name: Download Runtime artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages-runtime
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core packages artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages-aspnetcore
           path: aspnetcore/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core installers artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: installers-aspnetcore
           path: aspnetcore/artifacts/installers/Release
@@ -302,7 +302,7 @@ jobs:
         run: ls -lR installer/artifacts
 
       - name: Upload Installer Artifact
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: packages-installer
           compression-level: 0
@@ -318,14 +318,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: installers-*
           path: installers
@@ -344,14 +344,14 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: installers-*
           path: installers
