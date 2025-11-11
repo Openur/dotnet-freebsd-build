@@ -23,13 +23,13 @@ env:
   # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet9-aspire
   DOTNET_ASPIRE_VERSION: 9.5.2
   # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet9-core
-  DOTNET_VERSION: 9.0.10
+  DOTNET_VERSION: 9.0.11
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet9-runtime
-  DOTNET_RUNTIME_VERSION: 9.0.10
+  DOTNET_RUNTIME_VERSION: 9.0.11
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet9-aspnetcore
-  DOTNET_ASPNETCORE_VERSION: 9.0.10
+  DOTNET_ASPNETCORE_VERSION: 9.0.11
   # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet9-sdk
-  DOTNET_SDK_VERSION: 9.0.306
+  DOTNET_SDK_VERSION: 9.0.307
 
 jobs:
   build_aspire:
