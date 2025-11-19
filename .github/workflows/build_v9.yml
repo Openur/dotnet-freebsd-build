@@ -83,6 +83,15 @@ jobs:
           - x64
           - arm64
     steps:
+      - name: Prepare
+        run: |
+          df -h /
+          # Android
+          sudo rm -rf /usr/local/lib/android || true
+          df -h /
+          sudo rm -rf /usr/share/dotnet || true
+          df -h /
+
       - name: Checkout
         uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
