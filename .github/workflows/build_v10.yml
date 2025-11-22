@@ -60,7 +60,7 @@ jobs:
           NUGET_PACKAGES: /github/workspace/.nuget/packages
           ROOTFS_DIR: /crossrootfs/x64
         with:
-          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch x64 --target-rid freebsd-x64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:IncludeSymbols=false -p:IncludeSymbolsInPackage=false -p:SkipTestBuild=true -p:StabilizePackageVersion=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-x64"
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch x64 --target-rid freebsd-x64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:KeepNativeSymbols=false -p:SkipTestBuild=true -p:StabilizePackageVersion=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-x64"
 
       - name: Build arm64
         if: matrix.architecture == 'arm64'
@@ -69,7 +69,7 @@ jobs:
           NUGET_PACKAGES: /github/workspace/.nuget/packages
           ROOTFS_DIR: /crossrootfs/arm64
         with:
-          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch arm64 --target-rid freebsd-arm64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:IncludeSymbols=false -p:IncludeSymbolsInPackage=false -p:SkipTestBuild=true -p:StabilizePackageVersion=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-arm64"
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch arm64 --target-rid freebsd-arm64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:KeepNativeSymbols=false -p:SkipTestBuild=true -p:StabilizePackageVersion=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-arm64"
 
       - name: List artifacts
         run: ls -hlR vmr/artifacts/packages/Release/Shipping vmr/artifacts/assets/Release
