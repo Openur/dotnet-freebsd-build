@@ -53,6 +53,13 @@ jobs:
           ref: v${{ env.DOTNET_VMR_VERSION }}
           path: vmr
 
+      - name: Configure
+        working-directory: vmr
+        run: |
+          set -xe
+
+          patch -p1 < ../patches/vmr_common_args.patch
+
       - name: Build x64
         if: matrix.architecture == 'x64'
         uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net10.0-cross-freebsd-14-amd64
@@ -60,7 +67,7 @@ jobs:
           NUGET_PACKAGES: /github/workspace/.nuget/packages
           ROOTFS_DIR: /crossrootfs/x64
         with:
-          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch x64 --target-rid freebsd-x64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:IncludeSymbols=false -p:IncludeSymbolsInPackage=false -p:SkipTestBuild=true -p:StabilizePackageVersion=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-x64"
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch x64 --target-rid freebsd-x64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-x64 -p:KeepNativeSymbols=false -p:IncludeSymbols=false"
 
       - name: Build arm64
         if: matrix.architecture == 'arm64'
@@ -69,7 +76,7 @@ jobs:
           NUGET_PACKAGES: /github/workspace/.nuget/packages
           ROOTFS_DIR: /crossrootfs/arm64
         with:
-          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch arm64 --target-rid freebsd-arm64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:IncludeSymbols=false -p:IncludeSymbolsInPackage=false -p:SkipTestBuild=true -p:StabilizePackageVersion=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-arm64"
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch arm64 --target-rid freebsd-arm64 --source-build --clean-while-building --branding rtm --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-arm64 -p:KeepNativeSymbols=false -p:IncludeSymbols=false"
 
       - name: List artifacts
         run: ls -hlR vmr/artifacts/packages/Release/Shipping vmr/artifacts/assets/Release
@@ -96,6 +103,7 @@ jobs:
           path: |
             vmr/artifacts/assets/Release/Runtime/*/dotnet-runtime-*-freebsd-*.tar.gz
             vmr/artifacts/assets/Release/aspnetcore/Runtime/*/aspnetcore-runtime-*-freebsd-*.tar.gz
+            !vmr/artifacts/assets/Release/aspnetcore/Runtime/*/aspnetcore-runtime-composite-*
 
       - name: Upload Runtime Artifacts
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
