@@ -1,0 +1,14 @@
+diff --git a/repo-projects/Directory.Build.props b/repo-projects/Directory.Build.props
+index ca5007172..0f19f61e8 100644
+--- a/repo-projects/Directory.Build.props
++++ b/repo-projects/Directory.Build.props
+@@ -121,6 +121,9 @@
+ 
+     <CommonArgs>$(CommonArgs) /p:DotNetPackageVersionPropsPath=$(PackageVersionPropsPath)</CommonArgs>
+ 
++    <CommonArgs>$(CommonArgs) /p:KeepNativeSymbols=$(KeepNativeSymbols)</CommonArgs>
++    <CommonArgs>$(CommonArgs) /p:IncludeSymbols=$(IncludeSymbols)</CommonArgs>
++
+     <!-- Pass locations for assets -->
+     <CommonArgs>$(CommonArgs) /p:SourceBuiltAssetsDir=$(ArtifactsAssetsDir)</CommonArgs>
+     <CommonArgs>$(CommonArgs) /p:SourceBuiltAssetManifestsDir=$(RepoAssetManifestsDir)</CommonArgs>
