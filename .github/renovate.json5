@@ -36,7 +36,6 @@
       groupName: "dotnet9",
       matchDatasources: ["github-tags"],
       matchDepNames: [
-        "dotnet9-core",
         "dotnet9-runtime",
         "dotnet9-aspnetcore",
         "dotnet9-sdk"
@@ -44,14 +43,13 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      minimumGroupSize: 4,
+      minimumGroupSize: 3,
     },
     {
       description: ".NET 8 Group",
       groupName: "dotnet8",
       matchDatasources: ["github-tags"],
       matchDepNames: [
-        "dotnet8-core",
         "dotnet8-runtime",
         "dotnet8-aspnetcore",
         "dotnet8-sdk",
@@ -60,7 +58,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
-      minimumGroupSize: 5,
+      minimumGroupSize: 4,
     },
     {
       description: "GitHub Actions Group",

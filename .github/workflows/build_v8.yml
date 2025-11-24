@@ -22,8 +22,6 @@ env:
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet8-aspire
   DOTNET_ASPIRE_VERSION: 8.2.2
-  # renovate: datasource=github-tags packageName=dotnet/core depName=dotnet8-core
-  DOTNET_VERSION: 8.0.21
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet8-runtime
   DOTNET_RUNTIME_VERSION: 8.0.21
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet8-aspnetcore
@@ -152,8 +150,9 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: |
-            runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz
-            runtime/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
+            runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz
+            runtime/artifacts/packages/Release/Shipping/Microsoft.NETCore.App.Host.freebsd-*.*.nupkg
+            runtime/artifacts/packages/Release/Shipping/Microsoft.NETCore.App.Runtime.freebsd-*.*.nupkg
 
   build_aspnetcore:
     name: Build ASP.NET Core
@@ -197,7 +196,7 @@ jobs:
           dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name local --configfile aspnetcore/NuGet.config
 
           mkdir -p aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
-          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz aspnetcore/artifacts/obj/Microsoft.AspNetCore.App.Runtime
 
       - name: Build
         run: |
@@ -218,7 +217,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: |
-            aspnetcore/artifacts/packages/Release/Shipping/Microsoft.*.freebsd-x64.*.nupkg
+            aspnetcore/artifacts/packages/Release/Shipping/Microsoft.AspNetCore.App.Runtime.freebsd-*.*.nupkg
 
       - name: Upload Installers Artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
@@ -228,7 +227,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: |
-            aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz
+            aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-*.tar.gz
 
   build_installer:
     name: Build Installer
@@ -293,8 +292,8 @@ jobs:
           dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping/ --name aspnetcore --configfile installer/NuGet.config
 
           mkdir -p installer/artifacts/obj/redist/Release/downloads/
-          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
-          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-x64.tar.gz installer/artifacts/obj/redist/Release/downloads/
+          cp runtime/artifacts/packages/Release/Shipping/dotnet-runtime-*-freebsd-*.tar.gz installer/artifacts/obj/redist/Release/downloads/
+          cp aspnetcore/artifacts/installers/Release/aspnetcore-runtime-*-freebsd-*.tar.gz installer/artifacts/obj/redist/Release/downloads/
           cp sdk/artifacts/packages/Release/NonShipping/dotnet-toolset-internal-*.zip installer/artifacts/obj/redist/Release/downloads/
 
           sed -i.ORI 's/linux-x64;/&freebsd-x64;/g' installer/src/redist/targets/GenerateBundledVersions.targets
@@ -318,7 +317,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
           path: |
-            installer/artifacts/packages/Release/Shipping/dotnet-sdk-*
+            installer/artifacts/packages/Release/Shipping/dotnet-sdk-*.tar.gz
 
   artifacts:
     name: List artifacts
@@ -369,12 +368,16 @@ jobs:
       - name: Create release
         uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
         with:
-          artifacts: packages/dotnet-runtime-*-freebsd-x64.tar.gz,packages/dotnet-sdk-*-freebsd-x64.tar.gz,packages/Microsoft.*.freebsd-x64.*.nupkg,installers/aspnetcore-runtime-*-freebsd-x64.tar.gz
+          artifacts: |
+            packages/Microsoft.*.freebsd-*.*.nupkg
+            packages/dotnet-runtime-*-freebsd-*.tar.gz
+            installers/aspnetcore-runtime-*-freebsd-*.tar.gz
+#            packages/dotnet-sdk-*-freebsd-*.tar.gz
           artifactErrorsFailBuild: true
           draft: false
           generateReleaseNotes: false
           skipIfReleaseExists: true
-          name: .NET ${{ env.DOTNET_VERSION }} for FreeBSD (build ${{ github.run_number }})
+          name: v${{ env.DOTNET_SDK_VERSION }} for FreeBSD (build ${{ github.run_number }})
           tag: v${{ env.DOTNET_SDK_VERSION }}-${{ github.run_number }}
           immutableCreate: true
 
