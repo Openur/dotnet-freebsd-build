@@ -131,5 +131,29 @@
       matchPackageNames: ["actions/node-versions"],
       allowedVersions: "/18/",
     },
+    {
+      matchDatasources: ["github-tags"],
+      matchDepNames: ["/^dotnet10\\-/"],
+      allowedVersions: "/10.0/",
+    },
+    {
+      matchDatasources: ["github-tags"],
+      matchDepNames: [
+        "dotnet9-runtime",
+        "dotnet9-aspnetcore",
+        "dotnet9-sdk",
+      ],
+      allowedVersions: "/9.0/",
+    },
+    {
+      matchDatasources: ["github-tags"],
+      matchDepNames: [
+        "dotnet8-runtime",
+        "dotnet8-aspnetcore",
+        "dotnet8-sdk",
+        "dotnet8-installer",
+      ],
+      allowedVersions: "/8.0/",
+    },
   ]
 }
