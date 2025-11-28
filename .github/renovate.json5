@@ -125,5 +125,11 @@
       matchPackageNames: ["/dotnet/"],
       matchUpdateTypes: ["major"],
     },
+    {
+      matchDatasources: ["github-releases"],
+      matchFileNames: ["**/build_v8.yml"],
+      matchPackageNames: ["actions/node-versions"],
+      allowedVersions: "/18/",
+    },
   ]
 }
