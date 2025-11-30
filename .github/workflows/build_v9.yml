@@ -20,8 +20,6 @@ concurrency:
 env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
-  # renovate: datasource=github-tags packageName=dotnet/aspire depName=dotnet9-aspire
-  DOTNET_ASPIRE_VERSION: 9.5.2
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet9-runtime
   DOTNET_RUNTIME_VERSION: 9.0.11
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet9-aspnetcore
@@ -30,47 +28,6 @@ env:
   DOTNET_SDK_VERSION: 9.0.308
 
 jobs:
-  build_aspire:
-    name: Build Aspire
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-
-      - name: Checkout dotnet/aspire
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
-        with:
-          repository: dotnet/aspire
-          ref: v${{ env.DOTNET_ASPIRE_VERSION }}
-          path: aspire
-
-      - name: Configure
-        run: |
-          set -x
-
-          patch -p1 < patches/aspire_fix-gitinfo-target.patch
-
-      - name: Build
-        run: |
-          set -x
-          source common.sh
-          calculate_build_id v${{ env.DOTNET_ASPIRE_VERSION }}
-
-          aspire/build.sh --restore --build --ci --configuration Release --pack -p:InstallBrowsersForPlaywright=false -p:SkipTestProjects=true -p:OfficialBuildId=$OFFICIALBUILDID
-
-      - name: List artifacts
-        run: ls -lR aspire/artifacts
-
-      - name: Upload Packages Artifact
-        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
-        with:
-          name: packages-aspire
-          compression-level: 0
-          if-no-files-found: error
-          retention-days: 1
-          path: |
-            aspire/artifacts/packages/Release/Shipping/Microsoft.*.nupkg
-
   build_runtime:
     name: Build Runtime
     runs-on: ubuntu-latest
@@ -212,7 +169,6 @@ jobs:
   build_sdk:
     name: Build SDK
     needs:
-      - build_aspire
       - build_runtime
       - build_aspnetcore
     runs-on: ubuntu-latest
@@ -232,12 +188,6 @@ jobs:
           repository: dotnet/sdk
           ref: v${{ env.DOTNET_SDK_VERSION }}
           path: sdk
-
-      - name: Download Aspire artifacts
-        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
-        with:
-          name: packages-aspire
-          path: aspire/artifacts/packages/Release/Shipping
 
       - name: Download Runtime artifacts
         uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
@@ -261,7 +211,6 @@ jobs:
         run: |
           set -x
 
-          dotnet nuget add source ../aspire/artifacts/packages/Release/Shipping --name aspire --configfile sdk/NuGet.config
           dotnet nuget add source ../runtime/artifacts/packages/Release/Shipping/ --name runtime --configfile sdk/NuGet.config
           dotnet nuget add source ../aspnetcore/artifacts/packages/Release/Shipping/ --name aspnetcore --configfile sdk/NuGet.config
 
