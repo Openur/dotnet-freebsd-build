@@ -122,6 +122,7 @@
     {
       description: "Disable major updates for dotnet",
       enabled: false,
+      matchDatasources: ["github-tags"],
       matchPackageNames: ["/dotnet/"],
       matchUpdateTypes: ["major"],
     },
@@ -129,31 +130,22 @@
       matchDatasources: ["github-releases"],
       matchFileNames: ["**/build_v8.yml"],
       matchPackageNames: ["actions/node-versions"],
-      allowedVersions: "/18\\.x/",
+      allowedVersions: "==18",
     },
     {
       matchDatasources: ["github-tags"],
-      matchDepNames: ["/^dotnet10\\-/"],
-      allowedVersions: "/10.0/",
+      matchDepNames: ["dotnet10-*"],
+      allowedVersions: "==10.0",
     },
     {
       matchDatasources: ["github-tags"],
-      matchDepNames: [
-        "dotnet9-runtime",
-        "dotnet9-aspnetcore",
-        "dotnet9-sdk",
-      ],
-      allowedVersions: "/9.0/",
+      matchDepNames: ["dotnet9-*"],
+      allowedVersions: "==9.0",
     },
     {
       matchDatasources: ["github-tags"],
-      matchDepNames: [
-        "dotnet8-runtime",
-        "dotnet8-aspnetcore",
-        "dotnet8-sdk",
-        "dotnet8-installer",
-      ],
-      allowedVersions: "/8.0/",
+      matchDepNames: ["dotnet8-*"],
+      allowedVersions: "==8.0",
     },
   ]
 }
