@@ -76,7 +76,7 @@ jobs:
           args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_RUNTIME_VERSION }} && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch arm64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID --subset Clr.Native+Host.Native && /github/workspace/runtime/eng/build.sh --ci --configuration Release --cross --os freebsd --arch arm64 /p:IncludeSymbols=false /p:OfficialBuildId=$OFFICIALBUILDID /p:AppHostSourcePath=/github/workspace/runtime/artifacts/obj/freebsd-arm64.Release/apphost/standalone/apphost"
 
       - name: List artifacts
-        run: ls -lR runtime/artifacts
+        run: ls -hlR runtime/artifacts
 
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -144,7 +144,7 @@ jobs:
           aspnetcore/eng/build.sh --ci --os-name freebsd --arch ${{ matrix.architecture }} --configuration Release --all --no-build-java --pack /p:CrossgenOutput=false /p:TreatWarningsAsErrors=false /p:IncludeSymbols=false /p:SkipTestBuild=true /p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
-        run: ls -lR aspnetcore/artifacts
+        run: ls -hlR aspnetcore/artifacts
 
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -231,7 +231,7 @@ jobs:
           sdk/build.sh --ci --configuration Release --pack /p:OSName=freebsd /p:Architecture=${{ matrix.architecture }} /p:Rid=freebsd-${{ matrix.architecture }} /p:DISABLE_CROSSGEN=True /p:IncludeAspNetCoreRuntime=true /p:OfficialBuildId=$OFFICIALBUILDID
 
       - name: List artifacts
-        run: ls -lR sdk/artifacts
+        run: ls -hlR sdk/artifacts
 
       - name: Upload Packages Artifact
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -264,7 +264,7 @@ jobs:
           merge-multiple: true
 
       - name: List artifacts
-        run: ls -lR packages installers
+        run: ls -hlR packages installers
 
   release:
     name: Create release
