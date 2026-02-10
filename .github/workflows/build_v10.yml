@@ -21,7 +21,7 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   # renovate: datasource=github-tags packageName=dotnet/dotnet depName=dotnet10-vmr
-  DOTNET_VMR_VERSION: 10.0.102
+  DOTNET_VMR_VERSION: 10.0.103
 
 jobs:
   build_vmr:
@@ -50,7 +50,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           repository: dotnet/dotnet
-          ref: v${{ env.DOTNET_VMR_VERSION }}-sb1
+          ref: v${{ env.DOTNET_VMR_VERSION }}
           path: vmr
 
       - name: Build x64
