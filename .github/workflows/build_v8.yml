@@ -21,13 +21,13 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   # renovate: datasource=github-tags packageName=dotnet/runtime depName=dotnet8-runtime
-  DOTNET_RUNTIME_VERSION: 8.0.21
+  DOTNET_RUNTIME_VERSION: 8.0.24
   # renovate: datasource=github-tags packageName=dotnet/aspnetcore depName=dotnet8-aspnetcore
-  DOTNET_ASPNETCORE_VERSION: 8.0.21
+  DOTNET_ASPNETCORE_VERSION: 8.0.24
   # renovate: datasource=github-tags packageName=dotnet/sdk depName=dotnet8-sdk
-  DOTNET_SDK_VERSION: 8.0.415
+  DOTNET_SDK_VERSION: 8.0.418
   # renovate: datasource=github-tags packageName=dotnet/installer depName=dotnet8-installer
-  DOTNET_INSTALLER_VERSION: 8.0.415
+  DOTNET_INSTALLER_VERSION: 8.0.418
 
 jobs:
   build_sdk:
