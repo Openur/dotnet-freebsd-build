@@ -75,7 +75,7 @@ jobs:
         run: ls -hlR vmr/artifacts/packages/Release/Shipping vmr/artifacts/assets/Release
 
       - name: Upload Package Artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: artifacts-package-${{ matrix.architecture }}
           compression-level: 0
@@ -87,7 +87,7 @@ jobs:
             vmr/artifacts/packages/Release/Shipping/aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-*.*.nupkg
 
       - name: Upload Runtime Artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: artifacts-runtime-${{ matrix.architecture }}
           compression-level: 0
@@ -99,7 +99,7 @@ jobs:
             !vmr/artifacts/assets/Release/aspnetcore/Runtime/*/aspnetcore-runtime-composite-*
 
       - name: Upload Runtime Artifacts
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
         with:
           name: artifacts-sdk-${{ matrix.architecture }}
           compression-level: 0
@@ -115,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           pattern: artifacts-*
           path: artifacts
@@ -134,7 +134,7 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           pattern: artifacts-*
           path: artifacts
@@ -169,7 +169,7 @@ jobs:
         uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5.1.0
 
       - name: Download artifacts
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        uses: actions/download-artifact@70fc10c6e5e1ce46ad2ea6f2b72d43f7d47b13c3 # v8.0.0
         with:
           pattern: artifacts-*
           path: artifacts
