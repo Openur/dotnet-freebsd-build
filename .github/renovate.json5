@@ -35,7 +35,7 @@
     {
       description: ".NET 9 Group",
       groupName: "dotnet9",
-      matchDatasources: ["github-tags"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: [
         "dotnet9-runtime",
         "dotnet9-aspnetcore",
@@ -49,7 +49,7 @@
     {
       description: ".NET 8 Group",
       groupName: "dotnet8",
-      matchDatasources: ["github-tags"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: [
         "dotnet8-runtime",
         "dotnet8-aspnetcore",
@@ -123,28 +123,28 @@
     {
       description: "Disable major updates for dotnet",
       enabled: false,
-      matchDatasources: ["github-tags"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchPackageNames: ["/dotnet/"],
       matchUpdateTypes: ["major"],
     },
     {
-      matchDatasources: ["github-releases"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchFileNames: ["**/build_v8.yml"],
       matchPackageNames: ["actions/node-versions"],
       allowedVersions: "==18",
     },
     {
-      matchDatasources: ["github-tags"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet10-*"],
       allowedVersions: "==10.0",
     },
     {
-      matchDatasources: ["github-tags"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet9-*"],
       allowedVersions: "==9.0",
     },
     {
-      matchDatasources: ["github-tags"],
+      matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet8-*"],
       allowedVersions: "==8.0",
     },
