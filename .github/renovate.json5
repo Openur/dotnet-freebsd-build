@@ -7,6 +7,7 @@
     ":semanticCommits"
   ],
   dependencyDashboardTitle: "Renovate Dashboard",
+  minimumReleaseAge: "3 hours",
   schedule: [
     "* * * * *"
   ],
@@ -14,7 +15,7 @@
     "prEditedNotification",
     "prIgnoreNotification"
   ],
-  "ignorePresets": [
+  ignorePresets: [
     "group:aspireMonorepo",
     "group:dotnetMonorepo",
   ],
