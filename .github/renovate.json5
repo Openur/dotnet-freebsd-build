@@ -136,7 +136,7 @@
     {
       matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet10-*"],
-      allowedVersions: "<=10.0.199",
+      allowedVersions: "==10.0",
     },
     {
       matchDatasources: ["github-releases", "github-tags"],
