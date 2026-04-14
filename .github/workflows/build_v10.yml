@@ -75,7 +75,7 @@ jobs:
         run: ls -hlR vmr/artifacts/packages/Release/Shipping vmr/artifacts/assets/Release
 
       - name: Upload Package Artifacts
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: artifacts-package-${{ matrix.architecture }}
           compression-level: 0
@@ -87,7 +87,7 @@ jobs:
             vmr/artifacts/packages/Release/Shipping/aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-*.*.nupkg
 
       - name: Upload Runtime Artifacts
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: artifacts-runtime-${{ matrix.architecture }}
           compression-level: 0
@@ -99,7 +99,7 @@ jobs:
             !vmr/artifacts/assets/Release/aspnetcore/Runtime/*/aspnetcore-runtime-composite-*
 
       - name: Upload Runtime Artifacts
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: artifacts-sdk-${{ matrix.architecture }}
           compression-level: 0
