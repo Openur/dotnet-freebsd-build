@@ -130,7 +130,7 @@
       matchDatasources: ["github-releases", "github-tags"],
       matchFileNames: ["**/build_v8.yml"],
       matchPackageNames: ["actions/node-versions"],
-      allowedVersions: "==18",
+      allowedVersions: "==20",
     },
     {
       matchDatasources: ["github-releases", "github-tags"],
