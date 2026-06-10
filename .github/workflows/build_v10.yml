@@ -155,6 +155,7 @@ jobs:
           name: v${{ env.DOTNET_VMR_VERSION }} for FreeBSD (build ${{ github.run_number }})
           tag: v${{ env.DOTNET_VMR_VERSION }}-${{ github.run_number }}
           immutableCreate: true
+          makeLatest: true
 
   publish:
     name: Publish packages

@@ -304,6 +304,7 @@ jobs:
           name: v${{ env.DOTNET_SDK_VERSION }} for FreeBSD (build ${{ github.run_number }})
           tag: v${{ env.DOTNET_SDK_VERSION }}-${{ github.run_number }}
           immutableCreate: true
+          makeLatest: false
 
   publish:
     name: Publish packages
