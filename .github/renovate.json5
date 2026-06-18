@@ -80,22 +80,22 @@
       matchUpdateTypes: ["major"],
       semanticCommitType: "feat",
       commitMessagePrefix: "{{semanticCommitType}}({{semanticCommitScope}})!:",
-      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
+      commitMessageExtra: "({{currentVersion}} ➔ {{newVersion}})",
     },
     {
       matchUpdateTypes: ["minor"],
       semanticCommitType: "feat",
-      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
+      commitMessageExtra: "({{currentVersion}} ➔ {{newVersion}})",
     },
     {
       matchUpdateTypes: ["patch"],
       semanticCommitType: "fix",
-      commitMessageExtra: "( {{currentVersion}} ➔ {{newVersion}} )",
+      commitMessageExtra: "({{currentVersion}} ➔ {{newVersion}})",
     },
     {
       matchUpdateTypes: ["digest"],
-      semanticCommitType: "chore",
-      commitMessageExtra: "( {{currentDigestShort}} ➔ {{newDigestShort}} )",
+      semanticCommitType: "fix",
+      commitMessageExtra: "({{currentDigestShort}} ➔ {{newDigestShort}})",
     },
     {
       matchManagers: ["github-actions"],
@@ -104,20 +104,34 @@
       commitMessageTopic: "action {{depName}}",
     },
     {
+      matchDatasources: ["github-releases"],
+      semanticCommitType: "chore",
+      semanticCommitScope: "github-release",
+      commitMessageTopic: "release {{depName}}",
+    },
+    {
       matchUpdateTypes: ["major"],
-      labels: ["type/major"],
+      addLabels: ["type/major"],
     },
     {
       matchUpdateTypes: ["minor"],
-      labels: ["type/minor"],
+      addLabels: ["type/minor"],
     },
     {
       matchUpdateTypes: ["patch"],
-      labels: ["type/patch"],
+      addLabels: ["type/patch"],
+    },
+    {
+      matchUpdateTypes: ["digest"],
+      addLabels: ["type/digest"],
     },
     {
       matchManagers: ["github-actions"],
       addLabels: ["renovate/github-action"],
+    },
+    {
+      matchManagers: ["github-releases"],
+      addLabels: ["renovate/github-release"],
     },
     {
       description: "Disable major updates for dotnet",
