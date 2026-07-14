@@ -14,6 +14,7 @@
     "prEditedNotification",
     "prIgnoreNotification"
   ],
+  prConcurrentLimit: 1,
   ignorePresets: [
     "group:aspireMonorepo",
     "group:dotnetMonorepo",
