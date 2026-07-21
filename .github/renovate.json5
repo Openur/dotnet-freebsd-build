@@ -76,6 +76,7 @@
       group: {
         commitMessageTopic: "{{{groupName}}} group",
       },
+      commitBody: "[skip ci]",
     },
     {
       matchUpdateTypes: ["major"],
