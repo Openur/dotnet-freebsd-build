@@ -136,13 +136,6 @@
       addLabels: ["renovate/github-release"],
     },
     {
-      description: "Disable major updates for dotnet",
-      enabled: false,
-      matchDatasources: ["github-releases", "github-tags"],
-      matchPackageNames: ["/dotnet/"],
-      matchUpdateTypes: ["major"],
-    },
-    {
       matchDatasources: ["github-releases", "github-tags"],
       matchFileNames: ["**/build_v8.yml"],
       matchPackageNames: ["actions/node-versions"],
