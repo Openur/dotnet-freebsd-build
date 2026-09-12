@@ -47,21 +47,6 @@
       minimumGroupSize: 3,
     },
     {
-      description: ".NET 8 Group",
-      groupName: "dotnet8",
-      matchDatasources: ["github-releases", "github-tags"],
-      matchDepNames: [
-        "dotnet8-runtime",
-        "dotnet8-aspnetcore",
-        "dotnet8-sdk",
-        "dotnet8-installer"
-      ],
-      group: {
-        commitMessageTopic: "{{{groupName}}} group",
-      },
-      minimumGroupSize: 4,
-    },
-    {
       description: "GitHub Actions Group",
       groupName: "github-actions",
       matchManagers: ["github-actions"],
@@ -137,12 +122,6 @@
     },
     {
       matchDatasources: ["github-releases", "github-tags"],
-      matchFileNames: ["**/build_v8.yml"],
-      matchPackageNames: ["actions/node-versions"],
-      allowedVersions: "==20",
-    },
-    {
-      matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet10-*"],
       allowedVersions: "<=10.0.199",
     },
@@ -154,7 +133,7 @@
     {
       matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet8-*"],
-      allowedVersions: "==8.0",
+      allowedVersions: "<=8.0.199",
     },
   ]
 }
