@@ -56,7 +56,7 @@ jobs:
         run: ls -lR sdk/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: packages-sdk
           compression-level: 0
@@ -100,7 +100,7 @@ jobs:
         run: ls -lR runtime/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: packages-runtime
           compression-level: 0
@@ -136,7 +136,7 @@ jobs:
           node-version: 20.x
 
       - name: Download Runtime Packages Artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: packages-runtime
           path: runtime/artifacts/packages/Release/Shipping
@@ -162,7 +162,7 @@ jobs:
         run: ls -lR aspnetcore/artifacts
 
       - name: Upload Packages Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: packages-aspnetcore
           compression-level: 0
@@ -172,7 +172,7 @@ jobs:
             aspnetcore/artifacts/packages/Release/Shipping/Microsoft.AspNetCore.App.Runtime.freebsd-*.*.nupkg
 
       - name: Upload Installers Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: installers-aspnetcore
           compression-level: 0
@@ -200,25 +200,25 @@ jobs:
           path: installer
 
       - name: Download SDK artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: packages-sdk
           path: sdk/artifacts/packages/Release/NonShipping
 
       - name: Download Runtime artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: packages-runtime
           path: runtime/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core packages artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: packages-aspnetcore
           path: aspnetcore/artifacts/packages/Release/Shipping
 
       - name: Download ASP.NET Core installers artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: installers-aspnetcore
           path: aspnetcore/artifacts/installers/Release
@@ -249,7 +249,7 @@ jobs:
         run: ls -lR installer/artifacts
 
       - name: Upload Installer Artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: packages-installer
           compression-level: 0
@@ -265,14 +265,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: installers-*
           path: installers
@@ -291,14 +291,14 @@ jobs:
     if: github.event_name != 'pull_request'
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: packages-*
           path: packages
           merge-multiple: true
 
       - name: Download installers artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           pattern: installers-*
           path: installers
