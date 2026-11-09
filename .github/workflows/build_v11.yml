@@ -1,0 +1,181 @@
+name: 'Build .NET 11'
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/build_v11.yml'
+  pull_request:
+    branches:
+      - 'main'
+    paths:
+      - '.github/workflows/build_v11.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  # renovate: datasource=github-releases packageName=dotnet/dotnet depName=dotnet11-vmr
+  DOTNET_VMR_VERSION: 11.0.100-rc.3.26522.148
+
+jobs:
+  build_vmr:
+    name: Build VMR
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture:
+          - x64
+          - arm64
+    steps:
+      - name: Prepare
+        run: |
+          df -h /
+          # Android
+          sudo rm -rf /usr/local/lib/android || true
+          df -h /
+          sudo rm -rf /usr/share/dotnet || true
+          df -h /
+
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Checkout dotnet/dotnet
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: dotnet/dotnet
+          ref: v${{ env.DOTNET_VMR_VERSION }}
+          path: vmr
+
+      - name: Build x64
+        if: matrix.architecture == 'x64'
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-freebsd-15-amd64
+        env:
+          NUGET_PACKAGES: /github/workspace/.nuget/packages
+          ROOTFS_DIR: /crossrootfs/x64
+        with:
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch x64 --target-rid freebsd-x64 --source-build --clean-while-building --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-x64 -p:KeepNativeSymbols=false -p:IncludeSymbols=false"
+
+      - name: Build arm64
+        if: matrix.architecture == 'arm64'
+        uses: docker://mcr.microsoft.com/dotnet-buildtools/prereqs:azurelinux-3.0-net11.0-cross-freebsd-15-arm64
+        env:
+          NUGET_PACKAGES: /github/workspace/.nuget/packages
+          ROOTFS_DIR: /crossrootfs/arm64
+        with:
+          args: /bin/sh -c "source /github/workspace/common.sh && calculate_build_id v${{ env.DOTNET_VMR_VERSION }} && cd /github/workspace/vmr && /github/workspace/vmr/build.sh --prep --ci --configuration Release --target-os freebsd --target-arch arm64 --target-rid freebsd-arm64 --source-build --clean-while-building --official-build-id $OFFICIALBUILDID --verbosity normal -p:CrossBuild=true -p:PortableBuild=true -p:PortableTargetRid=freebsd-arm64 -p:KeepNativeSymbols=false -p:IncludeSymbols=false"
+
+      - name: List artifacts
+        run: ls -hlR vmr/artifacts/packages/Release/Shipping vmr/artifacts/assets/Release
+
+      - name: Upload Package Artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: artifacts-package-${{ matrix.architecture }}
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            vmr/artifacts/packages/Release/Shipping/runtime/Microsoft.NETCore.App.Host.freebsd-*.*.nupkg
+            vmr/artifacts/packages/Release/Shipping/runtime/Microsoft.NETCore.App.Runtime.freebsd-*.*.nupkg
+            vmr/artifacts/packages/Release/Shipping/aspnetcore/Microsoft.AspNetCore.App.Runtime.freebsd-*.*.nupkg
+
+      - name: Upload Runtime Artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: artifacts-runtime-${{ matrix.architecture }}
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            vmr/artifacts/assets/Release/Runtime/*/dotnet-runtime-*-freebsd-*.tar.gz
+            vmr/artifacts/assets/Release/aspnetcore/Runtime/*/aspnetcore-runtime-*-freebsd-*.tar.gz
+            !vmr/artifacts/assets/Release/aspnetcore/Runtime/*/aspnetcore-runtime-composite-*
+
+      - name: Upload Runtime Artifacts
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: artifacts-sdk-${{ matrix.architecture }}
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 1
+          path: |
+            vmr/artifacts/assets/Release/Sdk/*/dotnet-sdk-*-freebsd-*.tar.gz
+
+  artifacts:
+    name: List artifacts
+    needs:
+      - build_vmr
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: artifacts-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -hlR artifacts
+
+  release:
+    name: Create release
+    needs:
+      - build_vmr
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: artifacts-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create release
+        uses: ncipollo/release-action@339a81892b84b4eeb0f6e744e4574d79d0d9b8dd # v1.21.0
+        with:
+          artifacts: |
+            artifacts/**/Microsoft.*.freebsd-*.*.nupkg
+            artifacts/**/dotnet-runtime-*-freebsd-*.tar.gz
+            artifacts/**/aspnetcore-runtime-*-freebsd-*.tar.gz
+#            artifacts/**/dotnet-sdk-*-freebsd-*.tar.gz
+          artifactErrorsFailBuild: true
+          draft: false
+          generateReleaseNotes: false
+          skipIfReleaseExists: true
+          name: v${{ env.DOTNET_VMR_VERSION }} for FreeBSD (build ${{ github.run_number }})
+          tag: v${{ env.DOTNET_VMR_VERSION }}-${{ github.run_number }}
+          immutableCreate: true
+          makeLatest: true
+
+  publish:
+    name: Publish packages
+    needs:
+      - release
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    if: github.event_name != 'pull_request'
+    steps:
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+
+      - name: Download artifacts
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: artifacts-*
+          path: artifacts
+          merge-multiple: true
+
+      - name: Push to GitHub
+        shell: sh
+        run: dotnet nuget push artifacts/**/Microsoft.*.freebsd-*.*.nupkg --no-symbols --skip-duplicate --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json --api-key ${{ secrets.GITHUB_TOKEN }}
