@@ -21,7 +21,7 @@ env:
   NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
   DOTNET_CLI_TELEMETRY_OPTOUT: 1
   # renovate: datasource=github-releases packageName=dotnet/dotnet depName=dotnet11-vmr
-  DOTNET_VMR_VERSION: 11.0.100-rc.3.26522.148
+  DOTNET_VMR_VERSION: 11.0.100
 
 jobs:
   build_vmr:
