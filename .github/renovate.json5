@@ -145,21 +145,25 @@
       matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet11-*"],
       allowedVersions: "<=11.0.199",
+      prPriority: 9,
     },
     {
       matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet10-*"],
       allowedVersions: "<=10.0.199",
+      prPriority: 10,
     },
     {
       matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet9-*"],
       allowedVersions: "==9.0",
+      prPriority: 7,
     },
     {
       matchDatasources: ["github-releases", "github-tags"],
       matchDepNames: ["dotnet8-*"],
       allowedVersions: "==8.0",
+      prPriority: 8,
     },
   ]
 }
